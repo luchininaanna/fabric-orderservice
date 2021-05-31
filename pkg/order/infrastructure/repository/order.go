@@ -14,8 +14,8 @@ type orderRepository struct {
 
 func (or *orderRepository) Add(order model.Order) error {
 	_, err := or.tx.Exec(
-		"INSERT INTO `order`(id, cost, address, created_at) "+
-			"VALUES (UUID_TO_BIN(?), ?, ?, ?);", order.ID, order.Cost, order.Address, order.CreatedAt)
+		"INSERT INTO `order`(id, cost, status, address, created_at) "+
+			"VALUES (UUID_TO_BIN(?), ?, ?, ?, ?);", order.ID, order.Cost, model.OrderStatusOrderCreated, order.Address, order.CreatedAt)
 
 	if err != nil {
 		err = infrastructure.InternalError(err)
@@ -36,7 +36,9 @@ func (or *orderRepository) Add(order model.Order) error {
 
 func (or *orderRepository) Delete(orderUuid uuid.UUID) error {
 	_, err := or.tx.Exec(""+
-		"DELETE FROM `order` WHERE id = UUID_TO_BIN(?);", orderUuid)
+		"UPDATE `order` "+
+		"SET status = ?"+
+		"WHERE id = UUID_TO_BIN(?);", model.OrderStatusOrderCanceled, orderUuid)
 	if err != nil {
 		return err
 	}

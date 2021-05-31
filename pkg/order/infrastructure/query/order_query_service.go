@@ -31,12 +31,12 @@ func (qs *orderQueryService) GetOrder(id string) (*data.OrderData, error) {
 	defer infrastructure.CloseRows(rows)
 
 	if rows.Next() {
-		hackathon, err := parseOrder(rows)
+		order, err := parseOrder(rows)
 		if err != nil {
 			return nil, infrastructure.InternalError(err)
 		}
 
-		return hackathon, nil
+		return order, nil
 	}
 
 	return nil, nil // not found
@@ -49,6 +49,7 @@ func getSelectOrderSQL() string {
 		"GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.menu_item_id), \"=\", oi.quantity)) AS menuItems, " +
 		"o.created_at AS time, " +
 		"o.cost AS cost " +
+		"o.status AS status " +
 		"o.address AS address " +
 		"FROM `order` o " +
 		"LEFT JOIN order_item oi ON o.id = oi.order_id "
@@ -59,6 +60,7 @@ func parseOrder(r *sql.Rows) (*data.OrderData, error) {
 	var orderItems string
 	var t time.Time
 	var cost int
+	var status int
 	var address string
 
 	err := r.Scan(&orderId, &orderItems, &t, &cost, &address)
@@ -92,6 +94,7 @@ func parseOrder(r *sql.Rows) (*data.OrderData, error) {
 		OrderItems: modelOrderItems,
 		CreatedAt:  t,
 		Cost:       cost,
+		Status:     status,
 		Address:    address,
 	}, nil
 }

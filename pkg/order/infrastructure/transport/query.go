@@ -7,13 +7,21 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	"time"
 )
 
 type orderResponse struct {
-	OrderId string `json:"order_id"`
+	OrderId    string              `json:"order_id"`
+	OrderItems []orderItemResponse `json:"orderItems"`
+	Address    string              `json:"address"`
+	Cost       int                 `json:"cost"`
+	Status     string              `json:"status"`
+	CreatedAt  time.Time           `json:"created_at"`
 }
 
 type orderItemResponse struct {
+	ItemId   string `json:"item_id"`
+	Quantity int    `json:"quantity"`
 }
 
 func (s *server) getOrderInfo(w http.ResponseWriter, r *http.Request) {
@@ -33,9 +41,26 @@ func (s *server) getOrderInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var orderItems []orderItemResponse
+	for _, orderItem := range order.OrderItems {
+		orderItems = append(orderItems, orderItemResponse{ItemId: orderItem.ID.String(), Quantity: orderItem.Quantity})
+	}
+
+	orderStatus, err := WrapOrderStatus(order.Status)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	jsonOrder, err := json.Marshal(orderResponse{
 		order.ID.String(),
+		orderItems,
+		order.Address,
+		order.Cost,
+		orderStatus,
+		order.CreatedAt,
 	})
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

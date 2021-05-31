@@ -10,5 +10,6 @@ type OrderData struct {
 	OrderItems []OrderItemData
 	CreatedAt  time.Time
 	Cost       int
+	Status     int
 	Address    string
 }

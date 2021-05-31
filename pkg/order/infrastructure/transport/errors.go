@@ -8,6 +8,7 @@ import (
 )
 
 var InvalidItemsListError = errors.New("order: empty item list")
+var InvalidOrderStatusError = errors.New("order: invalid order status")
 var InternalError = commonErrors.InternalError
 
 func WrapError(err error) error {
