@@ -28,7 +28,11 @@ func (h *deleteOrderCommandHandler) Handle(c DeleteOrderCommand) error {
 		if err != nil {
 			return errors.InvalidArgumentError
 		}
-		return rp.Delete(orderUuid)
+		order, err := rp.Get(orderUuid)
+		if err != nil {
+			return errors.OrderNotExistError
+		}
+		return order.Delete()
 	})
 
 	return err

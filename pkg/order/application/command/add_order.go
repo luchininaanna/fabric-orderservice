@@ -45,18 +45,21 @@ func (h *addOrderCommandHandler) Handle(c AddOrderCommand) (*uuid.UUID, error) {
 			if err != nil {
 				return err
 			}
-			orderItems = append(orderItems, model.OrderItem{ID: itemUuid, Quantity: item.Quantity})
+
+			orderItem, err := model.NewOrderItem(itemUuid, item.Quantity)
+			if err != nil {
+				return err
+			}
+
+			orderItems = append(orderItems, *orderItem)
 		}
 
-		id := uuid.New()
-		orderId = &id
-		return rp.Add(model.Order{
-			ID:        id,
-			Items:     orderItems,
-			CreatedAt: time.Now(),
-			Cost:      cost,
-			Address:   c.Address,
-		})
+		order, err := model.NewOrder(uuid.New(), orderItems, time.Now(), cost, model.OrderStatusOrderCreated, c.Address)
+		if err != nil {
+			return err
+		}
+
+		return rp.Store(*order)
 	})
 
 	return orderId, err
