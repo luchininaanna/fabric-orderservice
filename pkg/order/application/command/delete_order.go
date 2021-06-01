@@ -3,6 +3,7 @@ package command
 import (
 	"github.com/google/uuid"
 	"orderservice/pkg/common/errors"
+	appErrors "orderservice/pkg/order/application/errors"
 	"orderservice/pkg/order/model"
 )
 
@@ -28,10 +29,16 @@ func (h *deleteOrderCommandHandler) Handle(c DeleteOrderCommand) error {
 		if err != nil {
 			return errors.InvalidArgumentError
 		}
+
 		order, err := rp.Get(orderUuid)
+		//TODO:: сделать так, чтобы err возвращалась не nil, когда order не найден
 		if err != nil {
-			return errors.OrderNotExistError
+			return appErrors.OrderNotExistError
 		}
+		if order == nil {
+			return appErrors.OrderNotExistError
+		}
+
 		return order.Delete()
 	})
 

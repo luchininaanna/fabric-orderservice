@@ -34,10 +34,11 @@ func (h *addOrderCommandHandler) Handle(c AddOrderCommand) (*uuid.UUID, error) {
 	err := h.unitOfWork.Execute(func(rp model.OrderRepository) error {
 
 		if len(c.Items) == 0 {
-			return errors.InvalidItemsListError
+			return errors.EmptyItemListError
 		}
 
-		cost := 78 //TODO:получить стоимость заказа
+		//TODO: проверить, что в заказе указаны существующие items (используя второй сервис)
+		cost := 78 //TODO: получить стоимость заказа (используя второй сервис)
 
 		orderItems := make([]model.OrderItem, 0)
 		for _, item := range c.Items {
@@ -51,7 +52,7 @@ func (h *addOrderCommandHandler) Handle(c AddOrderCommand) (*uuid.UUID, error) {
 				return err
 			}
 
-			orderItems = append(orderItems, *orderItem)
+			orderItems = append(orderItems, orderItem)
 		}
 
 		order, err := model.NewOrder(uuid.New(), orderItems, time.Now(), cost, model.OrderStatusOrderCreated, c.Address)
@@ -59,7 +60,7 @@ func (h *addOrderCommandHandler) Handle(c AddOrderCommand) (*uuid.UUID, error) {
 			return err
 		}
 
-		return rp.Store(*order)
+		return rp.Store(order)
 	})
 
 	return orderId, err

@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/google/uuid"
-	"orderservice/pkg/common/errors"
 	"time"
 )
 
@@ -25,21 +24,21 @@ type OrderRepository interface {
 	Get(orderUuid uuid.UUID) (*Order, error)
 }
 
-func NewOrder(orderUuid uuid.UUID, items []OrderItem, createdAt time.Time, cost int, status int, address string) (*Order, error) {
+func NewOrder(orderUuid uuid.UUID, items []OrderItem, createdAt time.Time, cost int, status int, address string) (Order, error) {
 
 	if len(items) == 0 {
-		return nil, errors.EmptyOrderError
+		return Order{}, EmptyOrderError
 	}
 
 	if cost <= 0 {
-		return nil, errors.InvalidOrderCostError
+		return Order{}, InvalidOrderCostError
 	}
 
 	if address == "" {
-		return nil, errors.EmptyOrderAddressError
+		return Order{}, EmptyOrderAddressError
 	}
 
-	return &Order{
+	return Order{
 		orderUuid,
 		items,
 		createdAt,
@@ -49,13 +48,13 @@ func NewOrder(orderUuid uuid.UUID, items []OrderItem, createdAt time.Time, cost 
 	}, nil
 }
 
-func NewOrderItem(itemUuid uuid.UUID, quantity int) (*OrderItem, error) {
+func NewOrderItem(itemUuid uuid.UUID, quantity int) (OrderItem, error) {
 
 	if quantity <= 0 {
-		return nil, errors.InvalidItemQuantityError
+		return OrderItem{}, InvalidItemQuantityError
 	}
 
-	return &OrderItem{
+	return OrderItem{
 		itemUuid,
 		quantity,
 	}, nil
@@ -67,5 +66,5 @@ func (o *Order) Delete() error {
 		return nil
 	}
 
-	return errors.OrderAlreadyDeletedError
+	return OrderAlreadyDeletedError
 }

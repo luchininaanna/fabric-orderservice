@@ -109,7 +109,7 @@ func parseOrder(r *sql.Rows) (*model.Order, error) {
 			return nil, err
 		}
 
-		orderItems = append(orderItems, *orderItem)
+		orderItems = append(orderItems, orderItem)
 	}
 
 	order, err := model.NewOrder(orderUuid, orderItems, createdAt, cost, status, address)
@@ -117,5 +117,5 @@ func parseOrder(r *sql.Rows) (*model.Order, error) {
 		return nil, err
 	}
 
-	return order, nil
+	return &order, nil
 }
