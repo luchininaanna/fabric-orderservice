@@ -22,9 +22,7 @@ services:
       - ../.env
     environment:
       MYSQL_DATABASE: ${ORDER_DATABASE_NAME}
-      MYSQL_USER: ${ORDER_DATABASE_USER}
-      MYSQL_PASSWORD: ${ORDER_DATABASE_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${ORDER_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${ORDER_DATABASE_PASSWORD}
     ports:
       - 3370:3306
     volumes:
