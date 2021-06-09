@@ -5,7 +5,7 @@ services:
     container_name: orderservice
     build:
       context: ../
-      dockerfile: docker/Dockerfile.orderservice.hackaton
+      dockerfile: docker/Dockerfile.orderservice
     env_file:
       - ../.env
     ports:
