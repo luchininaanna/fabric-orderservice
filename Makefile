@@ -6,8 +6,7 @@ endif
 build: fmt lint test
 	go build -o ./bin/orderservice cmd/orderservice/main.go
 
-fmt:)
-
+fmt:
 	go fmt ./...
 
 test:
