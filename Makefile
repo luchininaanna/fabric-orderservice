@@ -4,7 +4,7 @@ ifneq (,$(wildcard ./.env))
 endif
 
 build: fmt lint test
-	go build -o ./bin/orderservice cmd/orderservice/main.go
+	go build -o ./bin/orderservice cmd/main.go
 
 fmt:
 	go fmt ./...

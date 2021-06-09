@@ -34,3 +34,16 @@ func (m *mockUnitOfWork) Get(orderUuid uuid.UUID) (*model.Order, error) {
 
 	return nil, nil
 }
+
+func (m *mockUnitOfWork) Delete(orderUuid uuid.UUID) error {
+	if m.orders == nil {
+		m.orders = make(map[string]model.Order)
+	}
+
+	_, ok := m.orders[orderUuid.String()]
+	if ok {
+		delete(m.orders, orderUuid.String())
+	}
+
+	return nil
+}
