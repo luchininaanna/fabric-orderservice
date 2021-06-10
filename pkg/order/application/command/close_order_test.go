@@ -6,14 +6,14 @@ import (
 	"testing"
 )
 
-func TestDeleteNotExistentOrder(t *testing.T) {
+func TestCloseNotExistentOrder(t *testing.T) {
 	uow := &mockUnitOfWork{}
-	h := deleteOrderCommandHandler{uow}
-	err := h.Handle(DeleteOrderCommand{
+	h := closeOrderCommandHandler{uow}
+	err := h.Handle(CloseOrderCommand{
 		uuid.New().String(),
 	})
 
 	if err != errors.OrderNotExistError {
-		t.Error("Delete not existent order")
+		t.Error("Close not existent order")
 	}
 }

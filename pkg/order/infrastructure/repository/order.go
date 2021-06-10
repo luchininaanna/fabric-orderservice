@@ -17,8 +17,8 @@ type orderRepository struct {
 
 func (or *orderRepository) Store(order model.Order) error {
 	_, err := or.tx.Exec(
-		"INSERT INTO `order`(id, cost, status, address, created_at) "+
-			"VALUES (UUID_TO_BIN(?), ?, ?, ?, ?);", order.ID, order.Cost, order.Status, order.Address, order.CreatedAt)
+		"INSERT INTO `order`(id, status, cost, address, created_at, closed_at) "+
+			"VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, ?);", order.ID, order.Status, order.Cost, order.Address, order.CreatedAt, nil)
 
 	if err != nil {
 		err = infrastructure.InternalError(err)
@@ -26,7 +26,7 @@ func (or *orderRepository) Store(order model.Order) error {
 
 	for _, orderItem := range order.Items {
 		_, err = or.tx.Exec(""+
-			"INSERT INTO `order_item`(order_id, menu_item_id, quantity) "+
+			"INSERT INTO `order_item`(order_id, fabric_id, quantity) "+
 			"VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?), ?);", order.ID, orderItem.ID, orderItem.Quantity)
 		if err != nil {
 			log.Error(or.tx.Rollback())
@@ -37,7 +37,7 @@ func (or *orderRepository) Store(order model.Order) error {
 	return err
 }
 
-func (or *orderRepository) Get(orderUuid uuid.UUID) (*model.Order, error) {
+func (or *orderRepository) OrderNotExistError(orderUuid uuid.UUID) (*model.Order, error) {
 	orderIdBin, err := orderUuid.MarshalBinary()
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (or *orderRepository) Get(orderUuid uuid.UUID) (*model.Order, error) {
 		return order, nil
 	}
 
-	return nil, err
+	return nil, model.OrderNotExistError
 }
 
 func parseOrder(r *sql.Rows) (*model.Order, error) {
@@ -92,7 +92,7 @@ func parseOrder(r *sql.Rows) (*model.Order, error) {
 
 	menuItemsArray := strings.Split(menuItems, ",")
 
-	var orderItems []model.OrderItem
+	var orderItems []model.OrderItemDto
 	for _, menuItem := range menuItemsArray {
 		s := strings.Split(menuItem, "=")
 		itemUuid, err := uuid.Parse(s[0])
@@ -104,9 +104,9 @@ func parseOrder(r *sql.Rows) (*model.Order, error) {
 			return nil, err
 		}
 
-		orderItem, err := model.NewOrderItem(itemUuid, quantity)
-		if err != nil {
-			return nil, err
+		orderItem := model.OrderItemDto{
+			ID:       itemUuid,
+			Quantity: quantity,
 		}
 
 		orderItems = append(orderItems, orderItem)

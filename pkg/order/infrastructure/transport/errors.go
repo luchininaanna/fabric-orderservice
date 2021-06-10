@@ -5,23 +5,38 @@ import (
 	log "github.com/sirupsen/logrus"
 	commonErrors "orderservice/pkg/common/errors"
 	appErrors "orderservice/pkg/order/application/errors"
+	modelErrors "orderservice/pkg/order/model"
 )
 
-var EmptyItemListError = errors.New("order: empty item list")
-var InvalidOrderStatusError = errors.New("order: invalid order status")
-var OrderContainsNonExistentItemError = errors.New("order: order contains non-existent item")
 var InternalError = commonErrors.InternalError
+var OrderContainsNonExistentItemError = errors.New("order: order contains non-existent item")
+var OrderNotExistError = errors.New("order: order not exist")
+var OrderAlreadyClosedError = errors.New("order: order already closed")
+var InvalidItemQuantityError = errors.New("order: invalid item quantity")
+var EmptyOrderError = errors.New("order: empty order")
+var InvalidOrderCostError = errors.New("order: invalid order cost")
+var EmptyOrderAddressError = errors.New("order: empty order address")
 
 func WrapError(err error) error {
 	switch err {
 	case nil:
 		return nil
-	case appErrors.EmptyItemListError:
-		return EmptyItemListError
-	case appErrors.OrderContainsNonExistentItemError:
-		return OrderContainsNonExistentItemError
 	case commonErrors.InternalError:
 		return InternalError
+	case appErrors.OrderContainsNonExistentItemError:
+		return OrderContainsNonExistentItemError
+	case modelErrors.OrderNotExistError:
+		return OrderNotExistError
+	case modelErrors.OrderAlreadyClosedError:
+		return OrderAlreadyClosedError
+	case modelErrors.InvalidItemQuantityError:
+		return InvalidItemQuantityError
+	case modelErrors.EmptyOrderError:
+		return EmptyOrderError
+	case modelErrors.InvalidOrderCostError:
+		return InvalidOrderCostError
+	case modelErrors.EmptyOrderAddressError:
+		return EmptyOrderAddressError
 	default:
 		log.Error(err)
 		return InternalError

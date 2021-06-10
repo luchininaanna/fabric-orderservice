@@ -30,9 +30,8 @@ func Router(db *sql.DB) http.Handler {
 
 	s := r.PathPrefix("/api/v1").Subrouter()
 	s.HandleFunc("/order", srv.addOrder).Methods(http.MethodPost)
-	s.HandleFunc("/order/{ID:[0-9a-zA-Z-]+}", srv.deleteOrder).Methods(http.MethodDelete)
+	s.HandleFunc("/order/{ID:[0-9a-zA-Z-]+}", srv.closeOrder).Methods(http.MethodPost)
 	s.HandleFunc("/order/{ID:[0-9a-zA-Z-]+}", srv.getOrderInfo).Methods(http.MethodGet)
-
 	return cmd.LogMiddleware(r)
 }
 
@@ -58,6 +57,11 @@ func (s *server) addOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(addOrderCommand.Items) == 0 {
+		http.Error(w, "Empty item list", http.StatusBadRequest)
+		return
+	}
+
 	var h = command.NewAddOrderCommandHandler(s.unitOfWork)
 	id, err := h.Handle(addOrderCommand)
 	if err != nil {
@@ -68,7 +72,7 @@ func (s *server) addOrder(w http.ResponseWriter, r *http.Request) {
 	RenderJson(w, &addOrderResponse{id.String()})
 }
 
-func (s *server) deleteOrder(w http.ResponseWriter, r *http.Request) {
+func (s *server) closeOrder(w http.ResponseWriter, r *http.Request) {
 	id, found := mux.Vars(r)["ID"]
 	if !found {
 		w.WriteHeader(http.StatusBadRequest)
@@ -79,8 +83,8 @@ func (s *server) deleteOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var h = command.NewDeleteOrderCommandHandler(s.unitOfWork)
-	err := h.Handle(command.DeleteOrderCommand{ID: id})
+	var h = command.NewCloseOrderCommandHandler(s.unitOfWork)
+	err := h.Handle(command.CloseOrderCommand{ID: id})
 	if err != nil {
 		http.Error(w, WrapError(err).Error(), http.StatusBadRequest)
 		return

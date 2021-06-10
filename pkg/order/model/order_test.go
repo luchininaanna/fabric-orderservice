@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
-var mockOrderItems = []OrderItem{{uuid.New(), 5}}
+var mockOrderItems = []OrderItemDto{{uuid.New(), 5}}
 
 func TestCreateOrderWithEmptyItemList(t *testing.T) {
-	_, err := NewOrder(uuid.New(), []OrderItem{}, time.Now(), 77, 0, "Address")
+	_, err := NewOrder(uuid.New(), []OrderItemDto{}, time.Now(), 77, 0, "Address")
 	if err != EmptyOrderError {
 		t.Error("Create order with empty item list")
 	}
@@ -37,36 +37,36 @@ func TestCreateCorrectOrder(t *testing.T) {
 }
 
 func TestCreateOrderItemWithBelowZeroQuantity(t *testing.T) {
-	_, err := NewOrderItem(uuid.New(), -3)
+	_, err := newOrderItem(uuid.New(), -3)
 	if err != InvalidItemQuantityError {
 		t.Error("Create order item with below zero quantity")
 	}
 }
 
 func TestCreateOrderItemWithZeroQuantity(t *testing.T) {
-	_, err := NewOrderItem(uuid.New(), 0)
+	_, err := newOrderItem(uuid.New(), 0)
 	if err != InvalidItemQuantityError {
 		t.Error("Create order item with zero quantity")
 	}
 }
 
 func TestCreateCorrectOrderItem(t *testing.T) {
-	_, err := NewOrderItem(uuid.New(), 5)
+	_, err := newOrderItem(uuid.New(), 5)
 	if err != nil {
 		t.Error("Create correct order item with error")
 	}
 }
 
-func TestDeleteOrder(t *testing.T) {
+func TestCloseOrder(t *testing.T) {
 	order, err := NewOrder(uuid.New(), mockOrderItems, time.Now(), 77, 0, "Address")
 	if err != nil {
 		t.Error("Create correct order with error")
 		return
 	}
 
-	err = order.Delete()
-	if err == nil {
-		t.Error("Delete order successfully")
+	err = order.Close()
+	if err != nil {
+		t.Error("Close correct order with error")
 	}
 }
 
@@ -77,8 +77,8 @@ func TestDeleteAlreadyDeletedOrder(t *testing.T) {
 		return
 	}
 
-	err = order.Delete()
-	if err != OrderAlreadyDeletedError {
-		t.Error("Delete already deleted order")
+	err = order.Close()
+	if err != OrderAlreadyClosedError {
+		t.Error("Close already closed order")
 	}
 }

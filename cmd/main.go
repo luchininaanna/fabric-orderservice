@@ -36,9 +36,7 @@ func startServer(conf *config) *http.Server {
 	log.WithFields(log.Fields{"port": conf.ServerPort}).Info("starting the order server")
 	db := cmd.CreateDBConnection(conf.DatabaseConfig)
 
-	//ordersApi := orders.NewApi(db, tasks.NewApi())
-	//router := transport.Router(ordersApi)
-	router := transport.Router()
+	router := transport.Router(db)
 
 	srv := &http.Server{Addr: fmt.Sprintf(":%s", conf.ServerPort), Handler: router}
 	go func() {

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/google/uuid"
 	"orderservice/pkg/common/infrastructure"
+	"orderservice/pkg/order/application/errors"
 	"orderservice/pkg/order/application/query"
 	"orderservice/pkg/order/application/query/data"
 	"strconv"
@@ -39,14 +40,14 @@ func (qs *orderQueryService) GetOrder(id string) (*data.OrderData, error) {
 		return order, nil
 	}
 
-	return nil, nil // not found
+	return nil, errors.OrderNotExistError
 }
 
 func getSelectOrderSQL() string {
 	return "" +
-		"SELECT " +
-		"BIN_TO_UUID(o.id) AS id, " +
-		"GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.menu_item_id), \"=\", oi.quantity)) AS menuItems, " +
+		`SELECT " +
+		"BIN_TO_UUID(o.id) AS id, ` +
+		"GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.fabric_id), \"=\", oi.quantity)) AS menuItems, " +
 		"o.created_at AS time, " +
 		"o.cost AS cost " +
 		"o.status AS status " +
@@ -68,11 +69,6 @@ func parseOrder(r *sql.Rows) (*data.OrderData, error) {
 		return nil, err
 	}
 
-	orderUuid, err := uuid.Parse(orderId)
-	if err != nil {
-		return nil, err
-	}
-
 	orderItemsArray := strings.Split(orderItems, ",")
 
 	var modelOrderItems []data.OrderItemData
@@ -90,7 +86,7 @@ func parseOrder(r *sql.Rows) (*data.OrderData, error) {
 	}
 
 	return &data.OrderData{
-		ID:         orderUuid,
+		ID:         orderId,
 		OrderItems: modelOrderItems,
 		CreatedAt:  t,
 		Cost:       cost,

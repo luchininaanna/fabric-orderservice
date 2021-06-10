@@ -53,7 +53,7 @@ func (s *server) getOrderInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonOrder, err := json.Marshal(orderResponse{
-		order.ID.String(),
+		order.ID,
 		orderItems,
 		order.Address,
 		order.Cost,
