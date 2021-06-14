@@ -12,6 +12,7 @@ var InternalError = commonErrors.InternalError
 var OrderContainsNonExistentItemError = errors.New("order: order contains non-existent item")
 var OrderNotExistError = errors.New("order: order not exist")
 var OrderAlreadyClosedError = errors.New("order: order already closed")
+var OrderAlreadyInProcessError = errors.New("order: order already processing")
 var InvalidItemQuantityError = errors.New("order: invalid item quantity")
 var EmptyOrderError = errors.New("order: empty order")
 var InvalidOrderCostError = errors.New("order: invalid order cost")
@@ -29,6 +30,8 @@ func WrapError(err error) error {
 		return OrderNotExistError
 	case modelErrors.OrderAlreadyClosedError:
 		return OrderAlreadyClosedError
+	case modelErrors.OrderAlreadyInProcessError:
+		return OrderAlreadyInProcessError
 	case modelErrors.InvalidItemQuantityError:
 		return InvalidItemQuantityError
 	case modelErrors.EmptyOrderError:

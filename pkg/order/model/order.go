@@ -95,3 +95,11 @@ func (o *Order) Close() error {
 	}
 	return OrderAlreadyClosedError
 }
+
+func (o *Order) StartProcessing() error {
+	if o.Status != OrderStatusOrderInProcess {
+		o.Status = OrderStatusOrderInProcess
+		return nil
+	}
+	return OrderAlreadyInProcessError
+}

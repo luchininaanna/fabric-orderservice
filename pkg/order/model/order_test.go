@@ -70,7 +70,7 @@ func TestCloseOrder(t *testing.T) {
 	}
 }
 
-func TestDeleteAlreadyDeletedOrder(t *testing.T) {
+func TestCloseAlreadyClosedOrder(t *testing.T) {
 	order, err := NewOrder(uuid.New(), mockOrderItems, time.Now(), 77, 3, "Address")
 	if err != nil {
 		t.Error("Create correct order with error")
@@ -80,5 +80,31 @@ func TestDeleteAlreadyDeletedOrder(t *testing.T) {
 	err = order.Close()
 	if err != OrderAlreadyClosedError {
 		t.Error("Close already closed order")
+	}
+}
+
+func TestStartProcessingOrder(t *testing.T) {
+	order, err := NewOrder(uuid.New(), mockOrderItems, time.Now(), 77, 0, "Address")
+	if err != nil {
+		t.Error("Create correct order with error")
+		return
+	}
+
+	err = order.StartProcessing()
+	if err != nil {
+		t.Error("Start processing correct order with error")
+	}
+}
+
+func TestStartProcessingAlreadyProcessingOrder(t *testing.T) {
+	order, err := NewOrder(uuid.New(), mockOrderItems, time.Now(), 77, 3, "Address")
+	if err != nil {
+		t.Error("Create correct order with error")
+		return
+	}
+
+	err = order.StartProcessing()
+	if err != OrderAlreadyInProcessError {
+		t.Error("Start processing already processing order")
 	}
 }

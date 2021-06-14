@@ -30,7 +30,8 @@ func Router(db *sql.DB) http.Handler {
 
 	s := r.PathPrefix("/api/v1").Subrouter()
 	s.HandleFunc("/order", srv.addOrder).Methods(http.MethodPost)
-	s.HandleFunc("/order/{ID:[0-9a-zA-Z-]+}", srv.closeOrder).Methods(http.MethodPost)
+	s.HandleFunc("/close/order/{ID:[0-9a-zA-Z-]+}", srv.closeOrder).Methods(http.MethodPost)
+	s.HandleFunc("/process/order/{ID:[0-9a-zA-Z-]+}", srv.startProcessingOrder).Methods(http.MethodPost)
 	s.HandleFunc("/order/{ID:[0-9a-zA-Z-]+}", srv.getOrderInfo).Methods(http.MethodGet)
 	return cmd.LogMiddleware(r)
 }
@@ -85,6 +86,25 @@ func (s *server) closeOrder(w http.ResponseWriter, r *http.Request) {
 
 	var h = command.NewCloseOrderCommandHandler(s.unitOfWork)
 	err := h.Handle(command.CloseOrderCommand{ID: id})
+	if err != nil {
+		http.Error(w, WrapError(err).Error(), http.StatusBadRequest)
+		return
+	}
+}
+
+func (s *server) startProcessingOrder(w http.ResponseWriter, r *http.Request) {
+	id, found := mux.Vars(r)["ID"]
+	if !found {
+		w.WriteHeader(http.StatusBadRequest)
+		_, err := fmt.Fprint(w, "Order not found")
+		if err != nil {
+			log.Error(err)
+		}
+		return
+	}
+
+	var h = command.NewStartProcessingOrderCommandHandler(s.unitOfWork)
+	err := h.Handle(command.StartProcessingOrderCommand{ID: id})
 	if err != nil {
 		http.Error(w, WrapError(err).Error(), http.StatusBadRequest)
 		return
