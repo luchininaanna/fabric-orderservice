@@ -44,17 +44,17 @@ func (or *orderRepository) OrderNotExistError(orderUuid uuid.UUID) (*model.Order
 	}
 
 	rows, err := or.tx.Query(""+
-		"SELECT "+
-		"BIN_TO_UUID(o.id) AS id, "+
-		"GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.menu_item_id), \"=\", oi.quantity)) AS menuItems, "+
-		"o.created_at AS created_at, "+
-		"o.cost AS cost "+
-		"o.status AS status "+
-		"o.address AS address "+
+		`SELECT
+		   BIN_TO_UUID(o.id) AS id,
+		   GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.menu_item_id), \"=\", oi.quantity)) AS menuItems,
+		   o.created_at AS created_at,
+		   o.cost AS cost,
+		   o.status AS status,
+		   o.address AS address `+
 		"FROM `order` o "+
-		"LEFT JOIN order_item oi ON o.id = oi.order_id "+
-		"WHERE o.id = ? "+
-		"GROUP BY o.id", orderIdBin)
+		`LEFT JOIN order_item oi ON o.id = oi.order_id 
+		WHERE o.id = ? 
+		GROUP BY o.id`, orderIdBin)
 
 	if err != nil {
 		return nil, err

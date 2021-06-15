@@ -23,8 +23,8 @@ type orderQueryService struct {
 func (qs *orderQueryService) GetOrder(id string) (*data.OrderData, error) {
 	rows, err := qs.db.Query(""+
 		getSelectOrderSQL()+
-		"WHERE o.id = UUID_TO_BIN(?)"+
-		"GROUP BY o.id", id)
+		`WHERE o.id = UUID_TO_BIN(?) 
+		GROUP BY o.id`, id)
 
 	if err != nil {
 		return nil, infrastructure.InternalError(err)
@@ -44,16 +44,15 @@ func (qs *orderQueryService) GetOrder(id string) (*data.OrderData, error) {
 }
 
 func getSelectOrderSQL() string {
-	return "" +
-		`SELECT " +
-		"BIN_TO_UUID(o.id) AS id, ` +
-		"GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.fabric_id), \"=\", oi.quantity)) AS menuItems, " +
-		"o.created_at AS time, " +
-		"o.cost AS cost " +
-		"o.status AS status " +
-		"o.address AS address " +
-		"FROM `order` o " +
-		"LEFT JOIN order_item oi ON o.id = oi.order_id "
+	return `SELECT
+		BIN_TO_UUID(o.id) AS id,
+		GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.fabric_id), \"=\", oi.quantity)) AS menuItems,
+		o.created_at AS time,
+		o.cost AS cost,
+		o.status AS status,
+		o.address AS address` +
+		"FROM `order` o" +
+		`LEFT JOIN order_item oi ON o.id = oi.order_id`
 }
 
 func parseOrder(r *sql.Rows) (*data.OrderData, error) {
