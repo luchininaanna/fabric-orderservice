@@ -37,7 +37,7 @@ func (or *orderRepository) Store(order model.Order) error {
 	return err
 }
 
-func (or *orderRepository) OrderNotExistError(orderUuid uuid.UUID) (*model.Order, error) {
+func (or *orderRepository) Get(orderUuid uuid.UUID) (*model.Order, error) {
 	orderIdBin, err := orderUuid.MarshalBinary()
 	if err != nil {
 		return nil, err
