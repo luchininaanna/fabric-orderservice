@@ -33,6 +33,8 @@ func (u *unitOfWork) Execute(job func(rp model.OrderRepository) error) error {
 		if err2 != nil {
 			log.Error(err2)
 		}
+
+		err = err2
 	}
 
 	return err
