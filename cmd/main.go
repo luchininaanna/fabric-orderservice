@@ -10,7 +10,7 @@ import (
 	"orderservice/pkg/order/infrastructure/transport"
 )
 
-const appID = "orderService"
+const appID = "order"
 
 type config struct {
 	cmd.WebConfig

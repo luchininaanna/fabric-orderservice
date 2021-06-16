@@ -18,7 +18,8 @@ type orderRepository struct {
 func (or *orderRepository) Store(order model.Order) error {
 	_, err := or.tx.Exec(
 		"INSERT INTO `order`(id, status, cost, address, created_at, closed_at) "+
-			"VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, ?);", order.ID, order.Status, order.Cost, order.Address, order.CreatedAt, nil)
+			"VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, ?) "+
+			"ON DUPLICATE KEY UPDATE;", order.ID, order.Status, order.Cost, order.Address, order.CreatedAt, nil)
 
 	if err != nil {
 		err = infrastructure.InternalError(err)
