@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/google/uuid"
+	"orderservice/pkg/order/application/errors"
 	"orderservice/pkg/order/model"
 )
 
@@ -32,5 +33,5 @@ func (m *mockUnitOfWork) Get(orderUuid uuid.UUID) (*model.Order, error) {
 		return &o, nil
 	}
 
-	return nil, nil
+	return nil, errors.OrderNotExistError
 }

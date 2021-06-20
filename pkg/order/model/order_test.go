@@ -97,7 +97,7 @@ func TestStartProcessingOrder(t *testing.T) {
 }
 
 func TestStartProcessingAlreadyProcessingOrder(t *testing.T) {
-	order, err := NewOrder(uuid.New(), mockOrderItems, time.Now(), 77, 3, "Address")
+	order, err := NewOrder(uuid.New(), mockOrderItems, time.Now(), 77, OrderStatusOrderInProcess, "Address")
 	if err != nil {
 		t.Error("Create correct order with error")
 		return

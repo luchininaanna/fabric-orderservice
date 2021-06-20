@@ -7,12 +7,12 @@ import (
 
 type OrderItemDto struct {
 	ID       uuid.UUID
-	Quantity int
+	Quantity float32
 }
 
 type OrderItem struct {
 	ID       uuid.UUID
-	Quantity int
+	Quantity float32
 }
 
 type Order struct {
@@ -20,7 +20,7 @@ type Order struct {
 	Items      []OrderItem
 	CreatedAt  time.Time
 	CanceledAt *time.Time
-	Cost       int
+	Cost       float32
 	Status     int
 	Address    string
 }
@@ -30,7 +30,7 @@ type OrderRepository interface {
 	Get(orderUuid uuid.UUID) (*Order, error)
 }
 
-func NewOrder(orderUuid uuid.UUID, items []OrderItemDto, createdAt time.Time, cost int, status int, address string) (Order, error) {
+func NewOrder(orderUuid uuid.UUID, items []OrderItemDto, createdAt time.Time, cost float32, status int, address string) (Order, error) {
 
 	if len(items) == 0 {
 		return Order{}, EmptyOrderError
@@ -74,7 +74,7 @@ func getOrderItems(items []OrderItemDto) ([]OrderItem, error) {
 	return orderItems, nil
 }
 
-func newOrderItem(itemUuid uuid.UUID, quantity int) (OrderItem, error) {
+func newOrderItem(itemUuid uuid.UUID, quantity float32) (OrderItem, error) {
 
 	if quantity <= 0 {
 		return OrderItem{}, InvalidItemQuantityError

@@ -15,7 +15,7 @@ func WrapOrderStatus(orderStatus int) (string, error) {
 		return OrderCreated, nil
 	case model.OrderStatusOrderInProcess:
 		return OrderInProcess, nil
-	case model.OrderStatusOrderCanceled:
+	case model.OrderStatusOrderClosed:
 		return OrderCanceled, nil
 	case model.OrderStatusOrderShipped:
 		return OrderShipped, nil

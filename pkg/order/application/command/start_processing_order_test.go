@@ -10,7 +10,7 @@ func TestStartProcessingNotExistentOrder(t *testing.T) {
 	uow := &mockUnitOfWork{}
 	h := startProcessingOrderCommandHandler{uow}
 	err := h.Handle(StartProcessingOrderCommand{
-		uuid.New().String(),
+		uuid.New(),
 	})
 
 	if err != errors.OrderNotExistError {

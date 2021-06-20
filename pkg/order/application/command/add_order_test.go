@@ -5,5 +5,7 @@ import (
 )
 
 func TestAddOrderWithNonExistentItem(t *testing.T) {
-	//TODO:: добавить тест для OrderContainsNonExistentItemError
+	//if err != errors.OrderContainsNonExistentItemError {
+	//	t.Error("Create order with not existent item")
+	//}
 }

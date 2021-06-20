@@ -17,6 +17,7 @@ var InvalidItemQuantityError = errors.New("order: invalid item quantity")
 var EmptyOrderError = errors.New("order: empty order")
 var InvalidOrderCostError = errors.New("order: invalid order cost")
 var EmptyOrderAddressError = errors.New("order: empty order address")
+var InvalidOrderStatusError = errors.New("order: invalid order status")
 
 func WrapError(err error) error {
 	switch err {
@@ -40,6 +41,8 @@ func WrapError(err error) error {
 		return InvalidOrderCostError
 	case modelErrors.EmptyOrderAddressError:
 		return EmptyOrderAddressError
+	case InvalidOrderStatusError:
+		return InvalidOrderStatusError
 	default:
 		log.Error(err)
 		return InternalError

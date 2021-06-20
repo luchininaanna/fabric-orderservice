@@ -6,5 +6,5 @@ import (
 
 type OrderItemData struct {
 	ID       uuid.UUID
-	Quantity int
+	Quantity float32
 }

@@ -59,7 +59,7 @@ func parseOrder(r *sql.Rows) (*data.OrderData, error) {
 	var orderId string
 	var orderItems string
 	var t time.Time
-	var cost int
+	var cost float32
 	var status int
 	var address string
 
@@ -77,11 +77,11 @@ func parseOrder(r *sql.Rows) (*data.OrderData, error) {
 		if err != nil {
 			return nil, err
 		}
-		quantity, err := strconv.Atoi(s[1])
+		quantity, err := strconv.ParseFloat(s[1], 32)
 		if err != nil {
 			return nil, err
 		}
-		modelOrderItems = append(modelOrderItems, data.OrderItemData{ID: itemUuid, Quantity: quantity})
+		modelOrderItems = append(modelOrderItems, data.OrderItemData{ID: itemUuid, Quantity: float32(quantity)})
 	}
 
 	return &data.OrderData{

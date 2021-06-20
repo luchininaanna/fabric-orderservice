@@ -10,7 +10,7 @@ func TestCloseNotExistentOrder(t *testing.T) {
 	uow := &mockUnitOfWork{}
 	h := closeOrderCommandHandler{uow}
 	err := h.Handle(CloseOrderCommand{
-		uuid.New().String(),
+		uuid.New(),
 	})
 
 	if err != errors.OrderNotExistError {

@@ -14,14 +14,14 @@ type orderResponse struct {
 	OrderId    string              `json:"order_id"`
 	OrderItems []orderItemResponse `json:"orderItems"`
 	Address    string              `json:"address"`
-	Cost       int                 `json:"cost"`
+	Cost       float32             `json:"cost"`
 	Status     string              `json:"status"`
 	CreatedAt  time.Time           `json:"created_at"`
 }
 
 type orderItemResponse struct {
-	ItemId   string `json:"item_id"`
-	Quantity int    `json:"quantity"`
+	ItemId   string  `json:"item_id"`
+	Quantity float32 `json:"quantity"`
 }
 
 func (s *server) getOrderInfo(w http.ResponseWriter, r *http.Request) {

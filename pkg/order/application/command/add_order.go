@@ -2,13 +2,14 @@ package command
 
 import (
 	"github.com/google/uuid"
+	"math/rand"
 	"orderservice/pkg/order/model"
 	"time"
 )
 
 type OrderItem struct {
-	ID       string
-	Quantity int
+	ID       uuid.UUID
+	Quantity float32
 }
 
 type AddOrderCommand struct {
@@ -33,17 +34,12 @@ func (h *addOrderCommandHandler) Handle(c AddOrderCommand) (*uuid.UUID, error) {
 	err := h.unitOfWork.Execute(func(rp model.OrderRepository) error {
 		//TODO: проверить, что в заказе указаны существующие items (используя второй сервис)
 		// надо делать вне транзакции и лока
-		cost := 78 //TODO: получить стоимость заказа (используя второй сервис)
+		cost := rand.Float32() //TODO: получить стоимость заказа (используя второй сервис)
 
 		orderItemDtoList := make([]model.OrderItemDto, 0)
 		for _, item := range c.Items {
-			itemUuid, err := uuid.Parse(item.ID)
-			if err != nil {
-				return err
-			}
-
 			orderItemDto := model.OrderItemDto{
-				ID:       itemUuid,
+				ID:       item.ID,
 				Quantity: item.Quantity,
 			}
 

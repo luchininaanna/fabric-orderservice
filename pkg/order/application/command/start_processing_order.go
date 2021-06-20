@@ -2,13 +2,12 @@ package command
 
 import (
 	"github.com/google/uuid"
-	"orderservice/pkg/common/errors"
 	appErrors "orderservice/pkg/order/application/errors"
 	"orderservice/pkg/order/model"
 )
 
 type StartProcessingOrderCommand struct {
-	ID string
+	ID uuid.UUID
 }
 
 type startProcessingOrderCommandHandler struct {
@@ -25,12 +24,7 @@ func NewStartProcessingOrderCommandHandler(unitOfWork UnitOfWork) StartProcessin
 
 func (h *startProcessingOrderCommandHandler) Handle(c StartProcessingOrderCommand) error {
 	err := h.unitOfWork.Execute(func(rp model.OrderRepository) error {
-		orderUuid, err := uuid.Parse(c.ID)
-		if err != nil {
-			return errors.InvalidArgumentError
-		}
-
-		order, err := rp.Get(orderUuid)
+		order, err := rp.Get(c.ID)
 		if err != nil {
 			return appErrors.OrderNotExistError
 		}

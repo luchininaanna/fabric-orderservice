@@ -77,7 +77,7 @@ func parseOrder(r *sql.Rows) (*model.Order, error) {
 	var orderId string
 	var menuItems string
 	var createdAt time.Time
-	var cost int
+	var cost float32
 	var status int
 	var address string
 
@@ -100,14 +100,14 @@ func parseOrder(r *sql.Rows) (*model.Order, error) {
 		if err != nil {
 			return nil, err
 		}
-		quantity, err := strconv.Atoi(s[1])
+		quantity, err := strconv.ParseFloat(s[1], 32)
 		if err != nil {
 			return nil, err
 		}
 
 		orderItem := model.OrderItemDto{
 			ID:       itemUuid,
-			Quantity: quantity,
+			Quantity: float32(quantity),
 		}
 
 		orderItems = append(orderItems, orderItem)

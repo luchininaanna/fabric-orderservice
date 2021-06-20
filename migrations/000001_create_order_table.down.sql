@@ -1,2 +1,2 @@
-DROP TABLE IF EXISTS `order`;
 DROP TABLE IF EXISTS `order_item`;
+DROP TABLE IF EXISTS `order`;
