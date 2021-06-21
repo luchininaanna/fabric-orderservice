@@ -2,7 +2,6 @@ package command
 
 import (
 	"github.com/google/uuid"
-	appErrors "orderservice/pkg/order/application/errors"
 	"orderservice/pkg/order/model"
 )
 
@@ -26,7 +25,7 @@ func (h *startProcessingOrderCommandHandler) Handle(c StartProcessingOrderComman
 	err := h.unitOfWork.Execute(func(rp model.OrderRepository) error {
 		order, err := rp.Get(c.ID)
 		if err != nil {
-			return appErrors.OrderNotExistError
+			return err
 		}
 
 		err = order.StartProcessing()

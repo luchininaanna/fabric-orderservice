@@ -18,17 +18,23 @@ type orderRepository struct {
 func (or *orderRepository) Store(order model.Order) error {
 	_, err := or.tx.Exec(
 		"INSERT INTO `order`(id, status, cost, address, created_at, closed_at) "+
-			"VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, ?) "+
-			"ON DUPLICATE KEY UPDATE;", order.ID, order.Status, order.Cost, order.Address, order.CreatedAt, nil)
+			`VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, ?) 
+            ON DUPLICATE KEY UPDATE status = ?, cost = ?, address = ?, created_at = ?, closed_at = ?`,
+		order.ID, order.Status, order.Cost, order.Address, order.CreatedAt, order.ClosedAt,
+		order.Status, order.Cost, order.Address, order.CreatedAt, order.ClosedAt)
 
 	if err != nil {
 		err = infrastructure.InternalError(err)
+		return err
 	}
 
 	for _, orderItem := range order.Items {
 		_, err = or.tx.Exec(""+
-			"INSERT INTO `order_item`(order_id, fabric_id, quantity) "+
-			"VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?), ?);", order.ID, orderItem.ID, orderItem.Quantity)
+			`INSERT INTO order_item(order_id, fabric_id, quantity) 
+			VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?), ?) 
+            ON DUPLICATE KEY UPDATE quantity = ? `,
+			order.ID, orderItem.ID, orderItem.Quantity,
+			orderItem.Quantity)
 		if err != nil {
 			log.Error(or.tx.Rollback())
 			return err
@@ -47,7 +53,7 @@ func (or *orderRepository) Get(orderUuid uuid.UUID) (*model.Order, error) {
 	rows, err := or.tx.Query(""+
 		`SELECT
 		   BIN_TO_UUID(o.id) AS id,
-		   GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.menu_item_id), \"=\", oi.quantity)) AS menuItems,
+		   GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.fabric_id), '=', oi.quantity)) AS menuItems,
 		   o.created_at AS created_at,
 		   o.cost AS cost,
 		   o.status AS status,
@@ -60,6 +66,7 @@ func (or *orderRepository) Get(orderUuid uuid.UUID) (*model.Order, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer infrastructure.CloseRows(rows)
 
 	if rows.Next() {
 		order, err := parseOrder(rows)

@@ -43,16 +43,39 @@ func (qs *orderQueryService) GetOrder(id string) (*data.OrderData, error) {
 	return nil, errors.OrderNotExistError
 }
 
+func (qs *orderQueryService) GetOrders() ([]data.OrderData, error) {
+	rows, err := qs.db.Query("" +
+		getSelectOrderSQL() +
+		`GROUP BY o.id`)
+
+	if err != nil {
+		return nil, infrastructure.InternalError(err)
+	}
+	defer infrastructure.CloseRows(rows)
+
+	var orders []data.OrderData
+	for rows.Next() {
+		order, err := parseOrder(rows)
+		if err != nil {
+			return nil, infrastructure.InternalError(err)
+		}
+
+		orders = append(orders, *order)
+	}
+
+	return orders, nil
+}
+
 func getSelectOrderSQL() string {
 	return `SELECT
 		BIN_TO_UUID(o.id) AS id,
-		GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.fabric_id), \"=\", oi.quantity)) AS menuItems,
+		GROUP_CONCAT(CONCAT(BIN_TO_UUID(oi.fabric_id), '=', oi.quantity)) AS menuItems,
 		o.created_at AS time,
 		o.cost AS cost,
 		o.status AS status,
-		o.address AS address` +
-		"FROM `order` o" +
-		`LEFT JOIN order_item oi ON o.id = oi.order_id`
+		o.address AS address ` +
+		"FROM `order` o " +
+		`LEFT JOIN order_item oi ON o.id = oi.order_id `
 }
 
 func parseOrder(r *sql.Rows) (*data.OrderData, error) {
@@ -63,7 +86,7 @@ func parseOrder(r *sql.Rows) (*data.OrderData, error) {
 	var status int
 	var address string
 
-	err := r.Scan(&orderId, &orderItems, &t, &cost, &address)
+	err := r.Scan(&orderId, &orderItems, &t, &cost, &status, &address)
 	if err != nil {
 		return nil, err
 	}

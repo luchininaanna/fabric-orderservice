@@ -3,9 +3,9 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
-build: fmt lint test
+build: modules fmt lint test
 	go build -o ./bin/orderservice cmd/main.go
-	docker-compose -f docker/docker-compose.yml build
+	docker-compose -p orderservice -f docker/docker-compose.yml build
 
 fmt:
 	go fmt ./...
@@ -17,10 +17,10 @@ lint:
 	golangci-lint run
 
 up:
-	docker-compose -f docker/docker-compose.yml up -d
+	docker-compose -p orderservice -f docker/docker-compose.yml up -d
 
 down:
-	docker-compose -f docker/docker-compose.yml down
+	docker-compose -p orderservice -f docker/docker-compose.yml down
 
 db:
 	mysql -h 127.0.0.1 -u $(ORDER_DATABASE_USER) -p$(ORDER_DATABASE_PASSWORD) $(ORDER_DATABASE_NAME)
@@ -32,4 +32,7 @@ migrate_down:
 	migrate -database "$(ORDER_DATABASE_DRIVER)://$(ORDER_DATABASE_USER):$(ORDER_DATABASE_PASSWORD)@tcp(localhost:3370)/$(ORDER_DATABASE_NAME)" -path ./migrations down -all
 
 logs:
-	docker-compose -f docker/docker-compose.yml logs
+	docker-compose -p orderservice -f docker/docker-compose.yml logs
+
+modules:
+	go mod tidy

@@ -25,6 +25,8 @@ func WrapError(err error) error {
 		return nil
 	case commonErrors.InternalError:
 		return InternalError
+	case appErrors.OrderNotExistError:
+		return OrderNotExistError
 	case appErrors.OrderContainsNonExistentItemError:
 		return OrderContainsNonExistentItemError
 	case modelErrors.OrderNotExistError:

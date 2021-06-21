@@ -10,19 +10,19 @@ type OrderItemDto struct {
 	Quantity float32
 }
 
-type OrderItem struct {
+type orderItem struct {
 	ID       uuid.UUID
 	Quantity float32
 }
 
 type Order struct {
-	ID         uuid.UUID
-	Items      []OrderItem
-	CreatedAt  time.Time
-	CanceledAt *time.Time
-	Cost       float32
-	Status     int
-	Address    string
+	ID        uuid.UUID
+	Items     []orderItem
+	CreatedAt time.Time
+	ClosedAt  *time.Time
+	Cost      float32
+	Status    int
+	Address   string
 }
 
 type OrderRepository interface {
@@ -60,8 +60,8 @@ func NewOrder(orderUuid uuid.UUID, items []OrderItemDto, createdAt time.Time, co
 	}, nil
 }
 
-func getOrderItems(items []OrderItemDto) ([]OrderItem, error) {
-	orderItems := make([]OrderItem, 0)
+func getOrderItems(items []OrderItemDto) ([]orderItem, error) {
+	orderItems := make([]orderItem, 0)
 	for _, item := range items {
 		orderItem, err := newOrderItem(item.ID, item.Quantity)
 		if err != nil {
@@ -74,13 +74,13 @@ func getOrderItems(items []OrderItemDto) ([]OrderItem, error) {
 	return orderItems, nil
 }
 
-func newOrderItem(itemUuid uuid.UUID, quantity float32) (OrderItem, error) {
+func newOrderItem(itemUuid uuid.UUID, quantity float32) (orderItem, error) {
 
 	if quantity <= 0 {
-		return OrderItem{}, InvalidItemQuantityError
+		return orderItem{}, InvalidItemQuantityError
 	}
 
-	return OrderItem{
+	return orderItem{
 		itemUuid,
 		quantity,
 	}, nil
@@ -90,7 +90,7 @@ func (o *Order) Close() error {
 	if o.Status != OrderStatusOrderClosed {
 		o.Status = OrderStatusOrderClosed
 		now := time.Now()
-		o.CanceledAt = &now
+		o.ClosedAt = &now
 		return nil
 	}
 	return OrderAlreadyClosedError

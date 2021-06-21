@@ -21,21 +21,6 @@ type server struct {
 	oqs        query.OrderQueryService
 }
 
-func Router(db *sql.DB) http.Handler {
-	srv := &server{
-		repository.NewUnitOfWork(db),
-		queryImpl.NewOrderQueryService(db),
-	}
-	r := mux.NewRouter()
-
-	s := r.PathPrefix("/api/v1").Subrouter()
-	s.HandleFunc("/order", srv.addOrder).Methods(http.MethodPost)
-	s.HandleFunc("/close/order/{ID:[0-9a-zA-Z-]+}", srv.closeOrder).Methods(http.MethodPost)
-	s.HandleFunc("/process/order/{ID:[0-9a-zA-Z-]+}", srv.startProcessingOrder).Methods(http.MethodPost)
-	s.HandleFunc("/order/{ID:[0-9a-zA-Z-]+}", srv.getOrderInfo).Methods(http.MethodGet)
-	return cmd.LogMiddleware(r)
-}
-
 type orderItem struct {
 	ID       string  `json:"ID"`
 	Quantity float32 `json:"quantity"`
@@ -56,6 +41,22 @@ type startProcessingOrderRequest struct {
 
 type addOrderResponse struct {
 	Id string `json:"id"`
+}
+
+func Router(db *sql.DB) http.Handler {
+	srv := &server{
+		repository.NewUnitOfWork(db),
+		queryImpl.NewOrderQueryService(db),
+	}
+	r := mux.NewRouter()
+
+	s := r.PathPrefix("/api/v1").Subrouter()
+	s.HandleFunc("/order", srv.addOrder).Methods(http.MethodPost)
+	s.HandleFunc("/close/order", srv.closeOrder).Methods(http.MethodPost)
+	s.HandleFunc("/process/order", srv.startProcessingOrder).Methods(http.MethodPost)
+	s.HandleFunc("/order", srv.getOrderInfo).Methods(http.MethodGet)
+	s.HandleFunc("/orders", srv.getOrders).Methods(http.MethodGet)
+	return cmd.LogMiddleware(r)
 }
 
 func (s *server) addOrder(w http.ResponseWriter, r *http.Request) {

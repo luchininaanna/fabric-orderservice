@@ -51,6 +51,7 @@ func (h *addOrderCommandHandler) Handle(c AddOrderCommand) (*uuid.UUID, error) {
 			return err
 		}
 
+		orderId = &order.ID
 		return rp.Store(order)
 	})
 

@@ -2,7 +2,7 @@ package command
 
 import (
 	"github.com/google/uuid"
-	"orderservice/pkg/order/application/errors"
+	"orderservice/pkg/order/model"
 	"testing"
 )
 
@@ -13,7 +13,7 @@ func TestCloseNotExistentOrder(t *testing.T) {
 		uuid.New(),
 	})
 
-	if err != errors.OrderNotExistError {
+	if err != model.OrderNotExistError {
 		t.Error("Close not existent order")
 	}
 }
