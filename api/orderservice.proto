@@ -17,21 +17,21 @@ service OrderService {
 
   rpc CloseOrder(CloseOrderRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/close/order"
+      put: "/api/v1/close/order"
       body: "*"
     };
   }
 
-  rpc StartProcessingOrder(CloseOrderRequest) returns (google.protobuf.Empty) {
+  rpc StartProcessingOrder(StartProcessingOrderRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/process/order"
+      put: "/api/v1/process/order"
       body: "*"
     };
   }
 
   rpc GetOrderInfo(GetOrderInfoRequest) returns (OrderResponse) {
     option (google.api.http) = {
-      get: "/api/v1/order"
+      get: "/api/v1/order/{id}"
     };
   }
 
@@ -45,7 +45,7 @@ service OrderService {
 message CreateOrderRequest {
   message OrderItems {
     string id = 1;
-    int32 quantity = 2;
+    float quantity = 2;
   }
 
   repeated OrderItems items = 1;
@@ -71,13 +71,13 @@ message GetOrderInfoRequest {
 message OrderResponse {
   message OrderItems {
     string item_id = 1;
-    int32 quantity = 2;
+    float quantity = 2;
   }
 
   string order_id = 1;
   repeated OrderItems items = 2;
   string address = 3;
-  string cost = 4;
+  float cost = 4;
   string status = 5;
   string created_at = 6;
 }

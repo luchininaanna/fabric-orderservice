@@ -1,15 +1,15 @@
 package transport
 
 import (
+	"context"
 	"database/sql"
-	"encoding/json"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
 	"net/http"
+	orderservice "orderservice/api"
 	"orderservice/pkg/common/cmd"
-	"orderservice/pkg/common/infrastructure"
+	"orderservice/pkg/common/infrastructure/transport"
 	"orderservice/pkg/order/application/command"
 	"orderservice/pkg/order/application/query"
 	queryImpl "orderservice/pkg/order/infrastructure/query"
@@ -21,72 +21,15 @@ type server struct {
 	oqs        query.OrderQueryService
 }
 
-type orderItemRequest struct {
-	ID       string  `json:"id"`
-	Quantity float32 `json:"quantity"`
-}
-
-type addOrderRequest struct {
-	Items   []orderItemRequest `json:"items"`
-	Address string             `json:"address"`
-}
-
-type closeOrderRequest struct {
-	ID string `json:"id"`
-}
-
-type startProcessingOrderRequest struct {
-	ID string `json:"id"`
-}
-
-type addOrderResponse struct {
-	Id string `json:"id"`
-}
-
-func Router(db *sql.DB) http.Handler {
-	srv := &server{
-		repository.NewUnitOfWork(db),
-		queryImpl.NewOrderQueryService(db),
-	}
-	r := mux.NewRouter()
-
-	s := r.PathPrefix("/api/v1").Subrouter()
-	s.HandleFunc("/order", srv.addOrder).Methods(http.MethodPost)
-	s.HandleFunc("/close/order", srv.closeOrder).Methods(http.MethodPost)
-	s.HandleFunc("/process/order", srv.startProcessingOrder).Methods(http.MethodPost)
-	s.HandleFunc("/order", srv.getOrderInfo).Methods(http.MethodGet)
-	s.HandleFunc("/orders", srv.getOrders).Methods(http.MethodGet)
-	return cmd.LogMiddleware(r)
-}
-
-func (s *server) addOrder(w http.ResponseWriter, r *http.Request) {
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Fatal("Can't read request body with error")
-		return
-	}
-
-	defer infrastructure.LogError(r.Body.Close())
-
-	var request addOrderRequest
-	err = json.Unmarshal(b, &request)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Error("Can't parse json response with error")
-		return
-	}
-
+func (s *server) CreateOrder(_ context.Context, request *orderservice.CreateOrderRequest) (*orderservice.CreateOrderResponse, error) {
 	if len(request.Items) == 0 {
-		http.Error(w, "Empty item list", http.StatusBadRequest)
-		return
+		return nil, OrderWithEmptyItemListError
 	}
 
 	orderItemList, err := convertOrderItem(request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Error("Can't parse json response with error")
-		return
+		return nil, err
 	}
 
 	var h = command.NewAddOrderCommandHandler(s.unitOfWork)
@@ -96,17 +39,132 @@ func (s *server) addOrder(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		http.Error(w, WrapError(err).Error(), http.StatusBadRequest)
-		return
+		return nil, err
 	}
 
-	RenderJson(w, &addOrderResponse{id.String()})
+	return &orderservice.CreateOrderResponse{Id: id.String()}, nil
 }
 
-func convertOrderItem(request addOrderRequest) ([]command.OrderItem, error) {
+func (s *server) CloseOrder(_ context.Context, request *orderservice.CloseOrderRequest) (*empty.Empty, error) {
+	var h = command.NewCloseOrderCommandHandler(s.unitOfWork)
+
+	orderUid, err := uuid.Parse(request.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.Handle(command.CloseOrderCommand{ID: orderUid})
+	if err != nil {
+		return nil, err
+	}
+
+	return &empty.Empty{}, nil
+}
+
+func (s *server) StartProcessingOrder(_ context.Context, request *orderservice.StartProcessingOrderRequest) (*empty.Empty, error) {
+	var h = command.NewStartProcessingOrderCommandHandler(s.unitOfWork)
+
+	orderUid, err := uuid.Parse(request.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.Handle(command.StartProcessingOrderCommand{ID: orderUid})
+	if err != nil {
+		return nil, err
+	}
+
+	return &empty.Empty{}, nil
+}
+
+func (s *server) GetOrderInfo(_ context.Context, request *orderservice.GetOrderInfoRequest) (*orderservice.OrderResponse, error) {
+	order, err := s.oqs.GetOrder(request.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	var orderItems []*orderservice.OrderResponse_OrderItems
+	for _, orderItem := range order.OrderItems {
+		orderItems = append(orderItems, &orderservice.OrderResponse_OrderItems{
+			ItemId:   orderItem.ID.String(),
+			Quantity: orderItem.Quantity,
+		})
+	}
+
+	orderStatus, err := WrapOrderStatus(order.Status)
+	if err != nil {
+		return nil, err
+	}
+
+	response := orderservice.OrderResponse{
+		OrderId:   order.ID,
+		Items:     orderItems,
+		Address:   order.Address,
+		Cost:      order.Cost,
+		Status:    orderStatus,
+		CreatedAt: order.CreatedAt.String(),
+	}
+
+	return &response, nil
+}
+
+func (s *server) GetOrders(_ context.Context, empty *empty.Empty) (*orderservice.OrdersResponse, error) {
+	orders, err := s.oqs.GetOrders()
+	if err != nil {
+		return nil, err
+	}
+
+	var ordersResponseList []*orderservice.OrderResponse
+	for _, order := range orders {
+		var orderItems []*orderservice.OrderResponse_OrderItems
+		for _, orderItem := range order.OrderItems {
+			orderItems = append(orderItems, &orderservice.OrderResponse_OrderItems{
+				ItemId:   orderItem.ID.String(),
+				Quantity: orderItem.Quantity,
+			})
+		}
+
+		orderStatus, err := WrapOrderStatus(order.Status)
+		if err != nil {
+			return nil, err
+		}
+
+		ordersResponseList = append(ordersResponseList, &orderservice.OrderResponse{
+			OrderId:   order.ID,
+			Items:     orderItems,
+			Address:   order.Address,
+			Cost:      order.Cost,
+			Status:    orderStatus,
+			CreatedAt: order.CreatedAt.String(),
+		})
+	}
+
+	response := orderservice.OrdersResponse{
+		Orders: ordersResponseList,
+	}
+
+	return &response, nil
+}
+
+func Router(db *sql.DB) http.Handler {
+	srv := &server{
+		repository.NewUnitOfWork(db),
+		queryImpl.NewOrderQueryService(db),
+	}
+
+	router := transport.NewServeMux()
+	err := orderservice.RegisterOrderServiceHandlerServer(context.Background(), router, srv)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return cmd.LogMiddleware(router)
+}
+
+func convertOrderItem(request *orderservice.CreateOrderRequest) ([]command.OrderItem, error) {
 	orderItemList := make([]command.OrderItem, 0)
 	for _, item := range request.Items {
-		orderItemUid, err := uuid.Parse(item.ID)
+		orderItemUid, err := uuid.Parse(item.Id)
 		if err != nil {
 			log.Error("Can't parse order item uid")
 			return orderItemList, err
@@ -121,70 +179,4 @@ func convertOrderItem(request addOrderRequest) ([]command.OrderItem, error) {
 	}
 
 	return orderItemList, nil
-}
-
-func (s *server) closeOrder(w http.ResponseWriter, r *http.Request) {
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Error("Can't read request body with error")
-		return
-	}
-
-	defer infrastructure.LogError(r.Body.Close())
-
-	var request closeOrderRequest
-	err = json.Unmarshal(b, &request)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Error("Can't parse json response with error")
-		return
-	}
-
-	var h = command.NewCloseOrderCommandHandler(s.unitOfWork)
-
-	orderUid, err := uuid.Parse(request.ID)
-	if err != nil {
-		log.Error("Can't parse order uid")
-		return
-	}
-
-	err = h.Handle(command.CloseOrderCommand{ID: orderUid})
-	if err != nil {
-		http.Error(w, WrapError(err).Error(), http.StatusBadRequest)
-		return
-	}
-}
-
-func (s *server) startProcessingOrder(w http.ResponseWriter, r *http.Request) {
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Error("Can't read request body with error")
-		return
-	}
-
-	defer infrastructure.LogError(r.Body.Close())
-
-	var request startProcessingOrderRequest
-	err = json.Unmarshal(b, &request)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Error("Can't parse json response with error")
-		return
-	}
-
-	var h = command.NewStartProcessingOrderCommandHandler(s.unitOfWork)
-
-	orderUid, err := uuid.Parse(request.ID)
-	if err != nil {
-		log.Error("Can't parse order uid")
-		return
-	}
-
-	err = h.Handle(command.StartProcessingOrderCommand{ID: orderUid})
-	if err != nil {
-		http.Error(w, WrapError(err).Error(), http.StatusBadRequest)
-		return
-	}
 }

@@ -119,7 +119,7 @@
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -154,8 +154,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 400\", function () {",
-							"    pm.response.to.have.status(400);",
+							"pm.test(\"Status code is 500\", function () {",
+							"    pm.response.to.have.status(500);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -163,7 +163,7 @@
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -231,7 +231,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/v1/order",
+					"raw": "http://localhost:8000/api/v1/order/{{lastCreatedOrderId}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -240,7 +240,8 @@
 					"path": [
 						"api",
 						"v1",
-						"order"
+						"order",
+						"{{lastCreatedOrderId}}"
 					]
 				}
 			},
@@ -253,8 +254,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 400\", function () {",
-							"    pm.response.to.have.status(400);",
+							"pm.test(\"Status code is 500\", function () {",
+							"    pm.response.to.have.status(500);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -277,7 +278,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/v1/order",
+					"raw": "http://localhost:8000/api/v1/order/5f768ad1-a2f3-4545-b440-f0e71193b023",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -286,7 +287,8 @@
 					"path": [
 						"api",
 						"v1",
-						"order"
+						"order",
+						"5f768ad1-a2f3-4545-b440-f0e71193b023"
 					]
 				}
 			},
@@ -306,8 +308,9 @@
 							"pm.test(\"Get orders\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    var lastCreatedOrderExist = false;",
-							"    for (key in jsonData) {",
-							"        var order = jsonData[key];",
+							"    var orders = jsonData.orders",
+							"    for (key in orders) {",
+							"        var order = orders[key];",
 							"        if (order.order_id == pm.globals.get(\"lastCreatedOrderId\")) {",
 							"            lastCreatedOrderExist = true;",
 							"        }",
@@ -354,7 +357,7 @@
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -389,8 +392,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 400\", function () {",
-							"    pm.response.to.have.status(400);",
+							"pm.test(\"Status code is 500\", function () {",
+							"    pm.response.to.have.status(500);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -398,7 +401,7 @@
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",

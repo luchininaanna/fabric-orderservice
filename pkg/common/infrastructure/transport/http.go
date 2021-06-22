@@ -2,14 +2,22 @@ package transport
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
 	"net/http"
 	"orderservice/pkg/common/errors"
 	"time"
 )
+
+var grpcServeMuxOptions = &runtime.JSONPb{
+	EmitDefaults: true,
+	OrigName:     true,
+}
+
+func NewServeMux() *runtime.ServeMux {
+	return runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, grpcServeMuxOptions))
+}
 
 func LogMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -34,21 +42,6 @@ func RenderJson(w http.ResponseWriter, v interface{}) {
 		ProcessError(w, errors.InternalError)
 		return
 	}
-}
-
-func ReadJson(r *http.Request, output interface{}) error {
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return err
-	}
-	//defer CloseBody(r.Body)
-
-	err = json.Unmarshal(b, &output)
-	if err != nil {
-		err = fmt.Errorf("can't parse %s to json", b)
-	}
-
-	return err
 }
 
 func ProcessError(w http.ResponseWriter, e error) {
