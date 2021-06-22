@@ -36,3 +36,12 @@ logs:
 
 modules:
 	go mod tidy
+
+proto:
+	cd ./api && protoc -I/usr/local/include -I. \
+                 -I$$GOPATH/src \
+                 -I. \
+                 -I$$GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.16.0/third_party/googleapis \
+                 --swagger_out=logtostderr=true:. \
+                 --grpc-gateway_out=logtostderr=true:. \
+                 --go_out=plugins=grpc:. ./orderservice.proto

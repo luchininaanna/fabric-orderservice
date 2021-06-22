@@ -1,16 +1,87 @@
 syntax = "proto3";
 
 package orderservice;
+
 option go_package = "./;orderservice";
 
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
 service OrderService {
-  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {}
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/order"
+      body: "*"
+    };
+  }
+
+  rpc CloseOrder(CloseOrderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/close/order"
+      body: "*"
+    };
+  }
+
+  rpc StartProcessingOrder(CloseOrderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/process/order"
+      body: "*"
+    };
+  }
+
+  rpc GetOrderInfo(GetOrderInfoRequest) returns (OrderResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/order"
+    };
+  }
+
+  rpc GetOrders(google.protobuf.Empty) returns (OrdersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/orders"
+    };
+  }
 }
 
 message CreateOrderRequest {
-  string message = 1;
+  message OrderItems {
+    string id = 1;
+    int32 quantity = 2;
+  }
+
+  repeated OrderItems items = 1;
+  string address = 2;
 }
 
 message CreateOrderResponse {
-  string message = 1;
+  string id = 1;
+}
+
+message CloseOrderRequest {
+  string id = 1;
+}
+
+message StartProcessingOrderRequest {
+  string id = 1;
+}
+
+message GetOrderInfoRequest {
+  string id = 1;
+}
+
+message OrderResponse {
+  message OrderItems {
+    string item_id = 1;
+    int32 quantity = 2;
+  }
+
+  string order_id = 1;
+  repeated OrderItems items = 2;
+  string address = 3;
+  string cost = 4;
+  string status = 5;
+  string created_at = 6;
+}
+
+message OrdersResponse {
+  repeated OrderResponse items = 1;
 }
