@@ -83,5 +83,5 @@ message OrderResponse {
 }
 
 message OrdersResponse {
-  repeated OrderResponse items = 1;
+  repeated OrderResponse orders = 1;
 }

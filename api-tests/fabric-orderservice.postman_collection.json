@@ -80,7 +80,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"items\": [\n    {\n      \"ID\": \"{{lastAddedFabricId}}\",\n      \"quantity\": 6\n    }\n  ],\n  \"address\": \"Voznesenskaya, 110\"\n}",
+					"raw": "{\n  \"items\": [\n    {\n      \"id\": \"{{lastAddedFabricId}}\",\n      \"quantity\": 6\n    }\n  ],\n  \"address\": \"Voznesenskaya, 110\"\n}",
 					"options": {
 						"raw": {
 							"language": "text"
@@ -123,7 +123,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"ID\": \"{{lastCreatedOrderId}}\"\n}",
+					"raw": "{\n  \"id\": \"{{lastCreatedOrderId}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "text"
@@ -167,7 +167,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"ID\": \"5f768ad1-a2f3-4545-b440-f0e71193b023\"\n}",
+					"raw": "{\n  \"id\": \"7b55a46c-0eda-4ed0-8499-3960660de050\"\n}",
 					"options": {
 						"raw": {
 							"language": "text"
@@ -223,7 +223,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"ID\": \"{{lastCreatedOrderId}}\"\n}",
+					"raw": "{\n  \"id\": \"{{lastCreatedOrderId}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "text"
@@ -269,7 +269,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"ID\": \"5f768ad1-a2f3-4545-b440-f0e71193b023\"\n}",
+					"raw": "{\n  \"id\": \"5f768ad1-a2f3-4545-b440-f0e71193b023\"\n}",
 					"options": {
 						"raw": {
 							"language": "text"
@@ -358,7 +358,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"ID\": \"{{lastCreatedOrderId}}\"\n}",
+					"raw": "{\n  \"id\": \"{{lastCreatedOrderId}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "text"
@@ -402,7 +402,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"ID\": \"5f768ad1-a2f3-4545-b440-f0e71193b023\"\n}",
+					"raw": "{\n  \"id\": \"5f768ad1-a2f3-4545-b440-f0e71193b023\"\n}",
 					"options": {
 						"raw": {
 							"language": "text"

@@ -12,15 +12,19 @@ import (
 
 type orderResponse struct {
 	OrderId    string              `json:"order_id"`
-	OrderItems []orderItemResponse `json:"orderItems"`
+	OrderItems []orderItemResponse `json:"order_items"`
 	Address    string              `json:"address"`
 	Cost       float32             `json:"cost"`
 	Status     string              `json:"status"`
 	CreatedAt  time.Time           `json:"created_at"`
 }
 
+type ordersResponse struct {
+	Orders []orderResponse `json:"orders"`
+}
+
 type getOrderInfoRequest struct {
-	ID string `json:"ID"`
+	ID string `json:"id"`
 }
 
 type orderItemResponse struct {
@@ -92,7 +96,7 @@ func (s *server) getOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var ordersResponse []orderResponse
+	var orderResponseList []orderResponse
 	for _, order := range orders {
 		var orderItems []orderItemResponse
 		for _, orderItem := range order.OrderItems {
@@ -105,7 +109,7 @@ func (s *server) getOrders(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ordersResponse = append(ordersResponse, orderResponse{
+		orderResponseList = append(orderResponseList, orderResponse{
 			order.ID,
 			orderItems,
 			order.Address,
@@ -115,7 +119,9 @@ func (s *server) getOrders(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	jsonOrders, err := json.Marshal(ordersResponse)
+	jsonOrders, err := json.Marshal(ordersResponse{
+		orderResponseList,
+	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

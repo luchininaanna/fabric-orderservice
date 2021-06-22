@@ -21,22 +21,22 @@ type server struct {
 	oqs        query.OrderQueryService
 }
 
-type orderItem struct {
-	ID       string  `json:"ID"`
+type orderItemRequest struct {
+	ID       string  `json:"id"`
 	Quantity float32 `json:"quantity"`
 }
 
 type addOrderRequest struct {
-	Items   []orderItem `json:"items"`
-	Address string      `json:"address"`
+	Items   []orderItemRequest `json:"items"`
+	Address string             `json:"address"`
 }
 
 type closeOrderRequest struct {
-	ID string `json:"ID"`
+	ID string `json:"id"`
 }
 
 type startProcessingOrderRequest struct {
-	ID string `json:"ID"`
+	ID string `json:"id"`
 }
 
 type addOrderResponse struct {
