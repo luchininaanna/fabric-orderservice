@@ -7,7 +7,7 @@
 
 ## Диаграмма use-case
 Возможности пользователей в данном приложении отображены на следующей диаграмме.
-![Use-case diagram](/fabric-orderservice/diagrams/use_case.png)
+![Use-case diagram](/diagrams/use_case.png)
 
 ## Структура приложения
 В данном приложении можно выделить 2 микросервиса:
@@ -22,7 +22,7 @@
     - предоставляет возможность отредактировать ткань (изменить цену или количество в наличии)
     - по запросу возвращает список тканей
 
-![Component diagram](/fabric-orderservice/diagrams/component_diagram.png)
+![Component diagram](/diagrams/component_diagram.png)
 
 ## Как развернуть-собрать сервис и накатить миграции
 
