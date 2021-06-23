@@ -10,6 +10,7 @@ import (
 	"orderservice/pkg/common/cmd"
 	transportUtils "orderservice/pkg/common/infrastructure/transport"
 	"orderservice/pkg/order/infrastructure/transport"
+	"os"
 )
 
 const appID = "order"
@@ -30,13 +31,10 @@ func main() {
 	cmd.SetupLogger()
 
 	killSignalChan := cmd.GetKillSignalChan()
-	srv := startServer(&conf)
-
-	cmd.WaitForKillSignal(killSignalChan)
-	log.Fatal(srv.Shutdown(context.Background()))
+	startServer(&conf, killSignalChan)
 }
 
-func startServer(conf *config) *http.Server {
+func startServer(conf *config, killSignalChan chan os.Signal) {
 	log.WithFields(log.Fields{"port": conf.ServerPort}).Info("starting the order server")
 
 	db := cmd.CreateDBConnection(conf.DatabaseConfig)
@@ -53,5 +51,6 @@ func startServer(conf *config) *http.Server {
 		log.Fatal(db.Close())
 	}()
 
-	return srv
+	cmd.WaitForKillSignal(killSignalChan)
+	log.Fatal(srv.Shutdown(context.Background()))
 }
