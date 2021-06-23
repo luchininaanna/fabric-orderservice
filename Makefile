@@ -5,7 +5,6 @@ endif
 
 build: modules fmt proto lint test
 	go build -o ./bin/orderservice cmd/main.go
-	docker-compose -p orderservice -f docker/docker-compose.yml build
 
 fmt:
 	go fmt ./...
@@ -15,12 +14,6 @@ test:
 
 lint:
 	golangci-lint run
-
-up:
-	docker-compose -p orderservice -f docker/docker-compose.yml up -d
-
-down:
-	docker-compose -p orderservice -f docker/docker-compose.yml down
 
 db:
 	mysql -h 127.0.0.1 -u $(ORDER_DATABASE_USER) -p$(ORDER_DATABASE_PASSWORD) $(ORDER_DATABASE_NAME)
