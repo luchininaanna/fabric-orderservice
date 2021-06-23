@@ -29,6 +29,13 @@ service OrderService {
     };
   }
 
+  rpc SendOrder(SendOrderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/send/order"
+      body: "*"
+    };
+  }
+
   rpc GetOrderInfo(GetOrderInfoRequest) returns (OrderResponse) {
     option (google.api.http) = {
       get: "/api/v1/order/{id}"
@@ -61,6 +68,10 @@ message CloseOrderRequest {
 }
 
 message StartProcessingOrderRequest {
+  string id = 1;
+}
+
+message SendOrderRequest {
   string id = 1;
 }
 

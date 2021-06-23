@@ -96,6 +96,14 @@ func (o *Order) Close() error {
 	return OrderAlreadyClosedError
 }
 
+func (o *Order) Send() error {
+	if o.Status != OrderStatusOrderSend {
+		o.Status = OrderStatusOrderSend
+		return nil
+	}
+	return OrderAlreadySentError
+}
+
 func (o *Order) StartProcessing() error {
 	if o.Status != OrderStatusOrderInProcess {
 		o.Status = OrderStatusOrderInProcess

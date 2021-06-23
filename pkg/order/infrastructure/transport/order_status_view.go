@@ -7,7 +7,7 @@ import (
 const OrderCreated = "Created"
 const OrderInProcess = "InProcess"
 const OrderCanceled = "Canceled"
-const OrderShipped = "Shipped"
+const OrderSent = "Sent"
 
 func WrapOrderStatus(orderStatus int) (string, error) {
 	switch orderStatus {
@@ -17,8 +17,8 @@ func WrapOrderStatus(orderStatus int) (string, error) {
 		return OrderInProcess, nil
 	case model.OrderStatusOrderClosed:
 		return OrderCanceled, nil
-	case model.OrderStatusOrderShipped:
-		return OrderShipped, nil
+	case model.OrderStatusOrderSend:
+		return OrderSent, nil
 	default:
 		return "", InvalidOrderStatusError
 	}

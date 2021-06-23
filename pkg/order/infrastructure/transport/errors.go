@@ -13,6 +13,7 @@ var OrderContainsNonExistentItemError = errors.New("order: order contains non-ex
 var OrderNotExistError = errors.New("order: order not exist")
 var OrderAlreadyClosedError = errors.New("order: order already closed")
 var OrderAlreadyInProcessError = errors.New("order: order already processing")
+var OrderAlreadySentError = errors.New("order: order already sent")
 var InvalidItemQuantityError = errors.New("order: invalid item quantity")
 var EmptyOrderError = errors.New("order: empty order")
 var InvalidOrderCostError = errors.New("order: invalid order cost")
@@ -36,6 +37,8 @@ func WrapError(err error) error {
 		return OrderAlreadyClosedError
 	case modelErrors.OrderAlreadyInProcessError:
 		return OrderAlreadyInProcessError
+	case modelErrors.OrderAlreadySentError:
+		return OrderAlreadySentError
 	case modelErrors.InvalidItemQuantityError:
 		return InvalidItemQuantityError
 	case modelErrors.EmptyOrderError:
