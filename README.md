@@ -25,7 +25,7 @@
 ![Component diagram](/diagrams/component_diagram.png)
 
 ## Как развернуть-собрать сервис и накатить миграции
-Для совместной сборки сервисов (**order** и **store**) используется отдельный репозиторий [factory_deploy](https://github.com/luchininaanna/fabric-deploy).
+Для совместной сборки сервисов (**order** и **store**) используется отдельный репозиторий [factory-deploy](https://github.com/luchininaanna/fabric-deploy).
 
 Отдельно в данном сервисе можно выполнять следующие основные команды:
 * Собрать бинарный файл (также выполнится go mod tidy, сгенерируется api, выполнится lint, запустятся тесты)
