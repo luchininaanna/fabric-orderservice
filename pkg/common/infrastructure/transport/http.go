@@ -5,8 +5,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	log "github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 	"orderservice/pkg/common/errors"
+	"orderservice/pkg/common/infrastructure"
 	"time"
 )
 
@@ -55,4 +57,9 @@ func ProcessError(w http.ResponseWriter, e error) {
 func Parameter(r *http.Request, key string) (string, bool) {
 	val, found := mux.Vars(r)[key]
 	return val, found
+}
+
+func CloseService(closer io.Closer, subject ...string) {
+	log.Infof("Close %v", subject)
+	infrastructure.Close(closer, subject...)
 }

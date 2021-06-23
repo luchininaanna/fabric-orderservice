@@ -1,0 +1,207 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "storeservice.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/fabric": {
+      "post": {
+        "operationId": "StoreService_AddFabric",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storeserviceAddFabricResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storeserviceAddFabricRequest"
+            }
+          }
+        ],
+        "tags": [
+          "StoreService"
+        ]
+      },
+      "put": {
+        "operationId": "StoreService_UpdateFabric",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/storeserviceUpdateFabricRequest"
+            }
+          }
+        ],
+        "tags": [
+          "StoreService"
+        ]
+      }
+    },
+    "/api/v1/fabrics": {
+      "get": {
+        "operationId": "StoreService_GetFabrics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storeserviceFabricsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "StoreService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "FabricsResponseFabricResponse": {
+      "type": "object",
+      "properties": {
+        "fabric_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number",
+          "format": "float"
+        },
+        "cost": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "storeserviceAddFabricRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number",
+          "format": "float"
+        },
+        "cost": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "storeserviceAddFabricResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "storeserviceFabricsResponse": {
+      "type": "object",
+      "properties": {
+        "fabrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FabricsResponseFabricResponse"
+          }
+        }
+      }
+    },
+    "storeserviceUpdateFabricRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number",
+          "format": "float"
+        },
+        "cost": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    }
+  }
+}

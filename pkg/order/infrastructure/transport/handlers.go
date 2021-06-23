@@ -7,11 +7,14 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	orderservice "orderservice/api"
+	"orderservice/api/orderservice"
+	"orderservice/api/storeservice"
 	"orderservice/pkg/common/cmd"
 	"orderservice/pkg/common/infrastructure/transport"
+	"orderservice/pkg/order/application/adapter"
 	"orderservice/pkg/order/application/command"
 	"orderservice/pkg/order/application/query"
+	adapterImpl "orderservice/pkg/order/infrastructure/adapter"
 	queryImpl "orderservice/pkg/order/infrastructure/query"
 	"orderservice/pkg/order/infrastructure/repository"
 )
@@ -19,6 +22,7 @@ import (
 type server struct {
 	unitOfWork command.UnitOfWork
 	oqs        query.OrderQueryService
+	store      adapter.StoreAdapter
 }
 
 func (s *server) CreateOrder(_ context.Context, request *orderservice.CreateOrderRequest) (*orderservice.CreateOrderResponse, error) {
@@ -32,7 +36,7 @@ func (s *server) CreateOrder(_ context.Context, request *orderservice.CreateOrde
 		return nil, err
 	}
 
-	var h = command.NewAddOrderCommandHandler(s.unitOfWork)
+	var h = command.NewAddOrderCommandHandler(s.unitOfWork, s.store)
 	id, err := h.Handle(command.AddOrderCommand{
 		Items:   orderItemList,
 		Address: request.Address,
@@ -146,10 +150,11 @@ func (s *server) GetOrders(_ context.Context, empty *empty.Empty) (*orderservice
 	return &response, nil
 }
 
-func Router(db *sql.DB) http.Handler {
+func Router(db *sql.DB, storeApi storeservice.StoreServiceClient) http.Handler {
 	srv := &server{
-		repository.NewUnitOfWork(db),
-		queryImpl.NewOrderQueryService(db),
+		unitOfWork: repository.NewUnitOfWork(db),
+		oqs:        queryImpl.NewOrderQueryService(db),
+		store:      adapterImpl.NewStoreAdapter(storeApi),
 	}
 
 	router := transport.NewServeMux()

@@ -6,7 +6,9 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"orderservice/api/storeservice"
 	"orderservice/pkg/common/cmd"
+	transportUtils "orderservice/pkg/common/infrastructure/transport"
 	"orderservice/pkg/order/infrastructure/transport"
 )
 
@@ -15,6 +17,8 @@ const appID = "order"
 type config struct {
 	cmd.WebConfig
 	cmd.DatabaseConfig
+
+	StoreGRPCAddress string `envconfig:"store_grpc_address"`
 }
 
 func main() {
@@ -34,9 +38,14 @@ func main() {
 
 func startServer(conf *config) *http.Server {
 	log.WithFields(log.Fields{"port": conf.ServerPort}).Info("starting the order server")
-	db := cmd.CreateDBConnection(conf.DatabaseConfig)
 
-	router := transport.Router(db)
+	db := cmd.CreateDBConnection(conf.DatabaseConfig)
+	defer transportUtils.CloseService(db, "database connection")
+
+	storeConn := transportUtils.DialGRPC(conf.StoreGRPCAddress)
+	defer transportUtils.CloseService(storeConn, "scoring connection")
+
+	router := transport.Router(db, storeservice.NewStoreServiceClient(storeConn))
 
 	srv := &http.Server{Addr: fmt.Sprintf(":%s", conf.ServerPort), Handler: router}
 	go func() {

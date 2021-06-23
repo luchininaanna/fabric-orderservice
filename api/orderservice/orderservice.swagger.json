@@ -1,0 +1,298 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "orderservice.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/close/order": {
+      "put": {
+        "operationId": "OrderService_CloseOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/orderserviceCloseOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/order": {
+      "post": {
+        "operationId": "OrderService_CreateOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderserviceCreateOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/orderserviceCreateOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/order/{id}": {
+      "get": {
+        "operationId": "OrderService_GetOrderInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderserviceOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders": {
+      "get": {
+        "operationId": "OrderService_GetOrders",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderserviceOrdersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/process/order": {
+      "put": {
+        "operationId": "OrderService_StartProcessingOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/orderserviceStartProcessingOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "orderserviceCloseOrderRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "orderserviceCreateOrderRequest": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/orderserviceCreateOrderRequestOrderItems"
+          }
+        },
+        "address": {
+          "type": "string"
+        }
+      }
+    },
+    "orderserviceCreateOrderRequestOrderItems": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "orderserviceCreateOrderResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "orderserviceOrderResponse": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/orderserviceOrderResponseOrderItems"
+          }
+        },
+        "address": {
+          "type": "string"
+        },
+        "cost": {
+          "type": "number",
+          "format": "float"
+        },
+        "status": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        }
+      }
+    },
+    "orderserviceOrderResponseOrderItems": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "orderserviceOrdersResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/orderserviceOrderResponse"
+          }
+        }
+      }
+    },
+    "orderserviceStartProcessingOrderRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

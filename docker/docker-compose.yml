@@ -12,6 +12,7 @@ services:
       - ${ORDER_PORT}:${ORDER_PORT}
     depends_on:
       - orderservice_db
+      - storegrpcservice
 
   orderservice_db:
     image: mysql:8.0
