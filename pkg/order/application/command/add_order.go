@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 	"orderservice/pkg/order/application/adapter"
 	"orderservice/pkg/order/application/errors"
 	"orderservice/pkg/order/model"
@@ -37,6 +38,9 @@ func (h *addOrderCommandHandler) Handle(c AddOrderCommand) (*uuid.UUID, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	log.Error("---------------------")
+	log.Error(cost)
 
 	err = h.unitOfWork.Execute(func(rp model.OrderRepository) error {
 		orderItemDtoList := make([]model.OrderItemDto, 0)
@@ -75,6 +79,10 @@ func (h *addOrderCommandHandler) getTotalOrderCost(command AddOrderCommand) (*fl
 
 	for _, fabricInOrder := range command.Items {
 		fabricInOrderId := fabricInOrder.ID.String()
+
+		log.Error("---------===----")
+		log.Error(fabricInOrderId)
+
 		cost, ok := idToCostMap[fabricInOrderId]
 		if !ok {
 			return nil, errors.OrderContainsNonExistentItemError

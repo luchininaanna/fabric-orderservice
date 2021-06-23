@@ -24,9 +24,6 @@ migrate_up:
 migrate_down:
 	migrate -database "$(ORDER_DATABASE_DRIVER)://$(ORDER_DATABASE_USER):$(ORDER_DATABASE_PASSWORD)@tcp(localhost:3370)/$(ORDER_DATABASE_NAME)" -path ./migrations down -all
 
-logs:
-	docker-compose -p orderservice -f docker/docker-compose.yml logs
-
 modules:
 	go mod tidy
 
