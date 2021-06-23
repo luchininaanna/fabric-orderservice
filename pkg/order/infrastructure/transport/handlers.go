@@ -65,6 +65,22 @@ func (s *server) CloseOrder(_ context.Context, request *orderservice.CloseOrderR
 	return &empty.Empty{}, nil
 }
 
+func (s *server) SendOrder(_ context.Context, request *orderservice.SendOrderRequest) (*empty.Empty, error) {
+	var h = command.NewSendOrderCommandHandler(s.unitOfWork)
+
+	orderUid, err := uuid.Parse(request.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.Handle(command.SendOrderCommand{ID: orderUid})
+	if err != nil {
+		return nil, err
+	}
+
+	return &empty.Empty{}, nil
+}
+
 func (s *server) StartProcessingOrder(_ context.Context, request *orderservice.StartProcessingOrderRequest) (*empty.Empty, error) {
 	var h = command.NewStartProcessingOrderCommandHandler(s.unitOfWork)
 
